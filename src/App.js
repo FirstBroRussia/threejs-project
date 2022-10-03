@@ -1,15 +1,42 @@
-import * as THREE from './threejs-module/three.module.js';
+import * as THREE from './threejs/three.module.js';
+import ViewerParent from './threejs/components/viewer.js';
+
+const Viewer = new ViewerParent();
 
 export default class App {
+    object = null;
+
     constructor() {
-        this.createRenderer();
-        this.createCamera();
+        Viewer.init({
+            renderer: {
+                parentDOMElement: document.body,
+                antialias: true,
+                alpha: true,
+                // clearColor: 'gray',
+                pixelRatio: 1,
+            },
+        });
+        this.createObject();
     }
 
-    createRenderer() {
-        this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
+    createObject() {
+        this.object = new THREE.Mesh(
+            new THREE.BoxGeometry(1, 1, 1),
+            new THREE.MeshStandardMaterial({color: 'gray'})
+        );
 
-        document.body.appendChild(this.renderer.domElement);
+        Viewer.scene.add(this.object);
+
+        this.object.position.z = -5;
+
+        let that = this;
+
+        Viewer.addUpdate(
+            'rotate_object',
+            () => {
+                that.object.rotation.y += 0.01;
+            }
+        );
     }
+
 }
